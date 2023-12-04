@@ -6,14 +6,13 @@ const BASE_URL = 'https://pixabay.com/api/';
 
 export class App extends Component {
   state = {
-    img: null
+    images: []
   }
 
   componentDidMount() {
     this.performSearch('nature', 1);
   }
 
- 
   async performSearch(searchQuery, currentPage) {
     try {
       const response = await axios.get(BASE_URL, {
@@ -28,8 +27,14 @@ export class App extends Component {
         },
       });
 
+      const imagesData = response.data.hits.map(image => ({
+        id: image.id,
+        webformatURL: image.webformatURL,
+        largeImageURL: image.largeImageURL
+      }));
+
       this.setState({
-        img: response.data.hits
+        images: imagesData
       });
     } catch (error) {
       console.error('Mistake', error);
@@ -37,14 +42,16 @@ export class App extends Component {
   }
 
   render() {
-    const { img } = this.state;
+    const { images } = this.state;
 
     return (
       <div>
-        {img && (
+        {images && (
           <div>
-            {img.map(image => (
-              <img key={image.id} src={image.previewURL} alt={image.tags} />
+            {images.map(image => (
+              <div key={image.id}>
+                <img src={image.webformatURL} alt={`ID ${image.id}`} />               
+              </div>
             ))}
           </div>
         )}
