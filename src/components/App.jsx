@@ -6,11 +6,13 @@ const BASE_URL = 'https://pixabay.com/api/';
 
 export class App extends Component {
   state = {
-    images: []
+    images: [],
+    loading: false
   }
 
   componentDidMount() {
     this.performSearch('nature', 1);
+    this.setState({loading: true});
   }
 
   async performSearch(searchQuery, currentPage) {
@@ -34,7 +36,8 @@ export class App extends Component {
       }));
 
       this.setState({
-        images: imagesData
+        images: imagesData,
+        loading: false 
       });
     } catch (error) {
       console.error('Mistake', error);
@@ -46,6 +49,7 @@ export class App extends Component {
 
     return (
       <div>
+        {this.state.loading && <h2>Loading...</h2>}
         {images && (
           <div>
             {images.map(image => (
