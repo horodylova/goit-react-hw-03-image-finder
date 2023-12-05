@@ -1,23 +1,76 @@
-import React from 'react';
-
+import React, { Component } from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
+import { FetchImages } from './ImageApiService';
+import { ImageGallery } from './ImageGallery/ImageGallery';
+import { Button } from './Button/Button';
 
-export const App = () => {
-  return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 40,
-        color: '#010101'
-      }}
-    >
-      <Searchbar/>
-    </div>
-  );
-};
+export class App extends Component {
+  state = {
+    images: [],
+    error: null,
+    status: 'idle',
+    page: 1,
+    query: '',
+  };
+
+  componentDidUpdate(prevProps, prevState) {
+    if ((this.state.page !== prevState.page || this.state.query !== prevState.query) && this.state.status !== 'loading') {
+      this.handleSearch();
+    }
+  }
+
+  handleSearch = async () => {
+    try {
+      this.setState({ status: 'loading' });
+
+      const images = await FetchImages(this.state.query, this.state.page, 12);
+      console.log('Received images:', images);
+      this.setState({
+        images,
+        status: 'success'
+      });
+    } catch (error) {
+      this.setState({
+        error: error.message,
+        status: 'error'
+      });
+    }
+  };
+
+
+  handlePageChange = (newPage) => {
+    this.setState({ page: newPage });
+  };
+
+  handleSearchbarSubmit = (query) => {
+    this.setState({ query, page: 1 });
+  };
+
+  render() {
+    const { images, status, page, totalPages } = this.state;
+  
+    return (
+      <div>
+        <Searchbar onSubmit={this.handleSearchbarSubmit} />
+  
+        {(() => {
+          if (status === 'loading') {
+            return <p>Loading...</p>;
+          } else if (status === 'success') {
+            return  <>
+            <ImageGallery images={images} />
+            <Button currentPage={page} totalPages={totalPages} onLoadMore={this.handleLoadMore} />
+          </>
+          } else if (status === 'error') {
+            return <p>Error fetching images</p>;
+          } else {
+            return null;
+          }
+        })()}
+      </div>
+    );
+  }
+} 
 
 // import axios from 'axios';
 
