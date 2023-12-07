@@ -2,7 +2,8 @@ import React from 'react';
 import { ButtonStyle  } from './Button.styled'
 
 export const Button = ({ onLoadMore, isLoading }) => {
-  const handleClick = () => {
+  const handleClick = (e) => {
+    e.preventDefault();
     if (!isLoading) {
       onLoadMore();
     }

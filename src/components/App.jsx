@@ -26,17 +26,19 @@ export class App extends Component {
     this.setState({ isLoading: true, error: null });
 
     try {
-      const images = await FetchImages(this.state.query, this.state.page, 12);
+      const newImages = await FetchImages(this.state.query, this.state.page, 12);
 
-      this.setState({
-        images,
-      });
+      this.setState((prevState) => ({
+        images: [...prevState.images, ...newImages],
+      
+      }));
     } catch (error) {
       this.setState({
         error: error.message,
+        allImagesLoaded: false, 
       });
     } finally {
-      this.setState({ isLoading: false });
+      this.setState({ isLoading: false, allImagesLoaded: true });
     }
   };
 
@@ -49,7 +51,7 @@ export class App extends Component {
   };
 
   handleSearchbarSubmit = (query) => {
-    this.setState({ query, page: 1 });
+    this.setState({ query, page: 1, images: [] }); 
   };
 
   handleImageSelect = (selectedImage) => {
@@ -61,7 +63,7 @@ export class App extends Component {
   };
 
   render() {
-    const { images, page, isLoading, selectedImage, error } = this.state;
+    const { images, page, isLoading, selectedImage, error, allImagesLoaded } = this.state;
 
     return (
       <div>
@@ -71,7 +73,7 @@ export class App extends Component {
         {images.length > 0 && (
           <>
             <ImageGallery images={images} onSelect={this.handleImageSelect} />
-            <Button currentPage={page} onLoadMore={this.handleLoadMore} isLoading={isLoading} />
+            {allImagesLoaded && <Button currentPage={page} onLoadMore={this.handleLoadMore} isLoading={isLoading} />}
           </>
         )}
         {selectedImage && <Modal image={selectedImage} onClose={this.handleCloseModal} />}
