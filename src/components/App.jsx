@@ -3,6 +3,8 @@ import { Searchbar } from './Searchbar/Searchbar';
 import { FetchImages } from './ImageApiService';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
+import { Modal } from './Modal/Modal';
+import { MyLoader } from './Loader/Loader';
 
 export class App extends Component {
   state = {
@@ -11,6 +13,7 @@ export class App extends Component {
     status: 'idle',
     page: 1,
     query: '',
+    selectedImage: null,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -27,7 +30,7 @@ export class App extends Component {
       console.log('Received images:', images);
       this.setState({
         images,
-        status: 'success'
+        status: 'success',
       });
     } catch (error) {
       this.setState({
@@ -37,6 +40,9 @@ export class App extends Component {
     }
   };
 
+  handleLoadMore = () => {
+    this.setState((prevState) => ({ page: prevState.page + 1 }), this.handleSearch);
+  };
 
   handlePageChange = (newPage) => {
     this.setState({ page: newPage });
@@ -46,31 +52,46 @@ export class App extends Component {
     this.setState({ query, page: 1 });
   };
 
+  handleImageSelect = (selectedImage) => {
+    this.setState({ selectedImage });
+  };
+
+  handleCloseModal = () => {
+    this.setState({ selectedImage: null });
+  };
+
   render() {
-    const { images, status, page, totalPages } = this.state;
-  
+    const { images, status, page, totalPages, selectedImage } = this.state;
+
     return (
       <div>
         <Searchbar onSubmit={this.handleSearchbarSubmit} />
-  
+
         {(() => {
           if (status === 'loading') {
-            return <p>Loading...</p>;
+            return <MyLoader/>;
           } else if (status === 'success') {
-            return  <>
-            <ImageGallery images={images} />
-            <Button currentPage={page} totalPages={totalPages} onLoadMore={this.handleLoadMore} />
-          </>
+            return (
+              <>
+                <ImageGallery images={images} onSelect={this.handleImageSelect} />
+                <Button currentPage={page} totalPages={totalPages} onLoadMore={this.handleLoadMore} />
+              </>
+            );
           } else if (status === 'error') {
             return <p>Error fetching images</p>;
           } else {
             return null;
           }
         })()}
+
+        {selectedImage && <Modal image={selectedImage} onClose={this.handleCloseModal} />}
       </div>
     );
   }
-} 
+}
+
+
+
 
 // import axios from 'axios';
 
