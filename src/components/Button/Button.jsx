@@ -1,17 +1,21 @@
 import React from 'react';
+import { ButtonStyle  } from './Button.styled'
 
-export const Button = ({ onLoadMore }) => {
-  const handleLoadMoreClick = (e) => {
-    e.preventDefault();  
-
-    onLoadMore(); 
+export const Button = ({ onLoadMore, isLoading }) => {
+  const handleClick = () => {
+    if (!isLoading) {
+      onLoadMore();
+    }
   };
 
   return (
-   
-      <button type="button" className="buttonLoad" onClick={handleLoadMoreClick}>
-        Load more...
-      </button>
-  
+    <ButtonStyle
+      type="button"
+      onClick={handleClick}
+      disabled={isLoading}
+      isLoading={isLoading}
+    >
+      {isLoading ? 'Loading...' : 'Load more...'}
+    </ButtonStyle>
   );
 };

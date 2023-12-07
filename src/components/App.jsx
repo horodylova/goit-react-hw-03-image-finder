@@ -71,7 +71,7 @@ export class App extends Component {
         {images.length > 0 && (
           <>
             <ImageGallery images={images} onSelect={this.handleImageSelect} />
-            <Button currentPage={page} onLoadMore={this.handleLoadMore} />
+            <Button currentPage={page} onLoadMore={this.handleLoadMore} isLoading={isLoading} />
           </>
         )}
         {selectedImage && <Modal image={selectedImage} onClose={this.handleCloseModal} />}

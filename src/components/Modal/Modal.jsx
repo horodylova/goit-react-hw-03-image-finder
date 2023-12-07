@@ -24,7 +24,6 @@ export class Modal extends Component {
 
   render() {
     const { image } = this.props;
-    console.log('Rendering Modal component');
 
     return (
       <Overlay onClick={this.handleClickOutside}>

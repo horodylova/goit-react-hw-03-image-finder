@@ -1,24 +1,18 @@
 import React from 'react';
+import { ImageGalleryStyle, ImageGalleryItemStyle } from './ImageGallery.styled';
 
 export const ImageGallery = ({ images, onSelect }) => {
-  const handleImageClick = (selectedImage) => {
-    onSelect(selectedImage);
-  };
-
   return (
-    <ul className="image-gallery">
-      {images.map(image => (
-        <li
-          key={image.id}
-          className="image-gallery-item"
-          onClick={() => handleImageClick(image)}
-        >
+    <ImageGalleryStyle>
+      {images.map((image) => (
+        <ImageGalleryItemStyle key={image.id} onClick={() => onSelect(image)}>
           <img src={image.webformatURL} alt={`ID ${image.id}`} />
-        </li>
+        </ImageGalleryItemStyle>
       ))}
-    </ul>
+    </ImageGalleryStyle>
   );
 };
+
 
 
   

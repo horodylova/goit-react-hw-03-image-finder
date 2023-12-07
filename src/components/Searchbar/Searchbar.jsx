@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SearchbarStyle, SearchButton, SearchFormButtonLabel, Input } from './Searchbar.styled';
 
 export const Searchbar = ({ onSubmit }) => {
   const [image, setImage] = useState('');
@@ -15,19 +16,19 @@ export const Searchbar = ({ onSubmit }) => {
 
   return (
     <header className="searchbar">
-      <form className="form" onSubmit={handleSubmit}>
-        <button type="submit" className="button">
-          <span className="button-label">Search</span>
-        </button>
+      <SearchbarStyle onSubmit={handleSubmit}>
+        <SearchButton type="submit" >
+          <SearchFormButtonLabel>Search</SearchFormButtonLabel>
+        </SearchButton >
 
-        <input
+        <Input
           className="input"
           type="text"
           value={image}
           onChange={handleNameChange}
           placeholder="Search images and photos"
         />
-      </form>
+      </SearchbarStyle>
     </header>
   );
 };
