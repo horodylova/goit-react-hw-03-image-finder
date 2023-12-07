@@ -14,6 +14,7 @@ export class App extends Component {
     page: 1,
     query: '',
     selectedImage: null,
+    allImagesLoaded: true
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -23,7 +24,7 @@ export class App extends Component {
   }
 
   handleSearch = async () => {
-    this.setState({ isLoading: true, error: null });
+    this.setState({ isLoading: true, error: null, allImagesLoaded: false });
 
     try {
       const newImages = await FetchImages(this.state.query, this.state.page, 12);
@@ -51,7 +52,7 @@ export class App extends Component {
   };
 
   handleSearchbarSubmit = (query) => {
-    this.setState({ query, page: 1, images: [] }); 
+    this.setState({ query, page: 1, images: [] , allImagesLoaded: false}); 
   };
 
   handleImageSelect = (selectedImage) => {
