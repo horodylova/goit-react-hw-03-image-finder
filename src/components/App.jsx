@@ -10,38 +10,38 @@ export class App extends Component {
   state = {
     images: [],
     error: null,
-    status: 'idle',
+    isLoading: false,
     page: 1,
     query: '',
     selectedImage: null,
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if ((this.state.page !== prevState.page || this.state.query !== prevState.query) && this.state.status !== 'loading') {
+    if (this.state.page !== prevState.page || this.state.query !== prevState.query) {
       this.handleSearch();
     }
   }
 
   handleSearch = async () => {
-    try {
-      this.setState({ status: 'loading' });
+    this.setState({ isLoading: true, error: null });
 
+    try {
       const images = await FetchImages(this.state.query, this.state.page, 12);
-      console.log('Received images:', images);
+
       this.setState({
         images,
-        status: 'success',
       });
     } catch (error) {
       this.setState({
         error: error.message,
-        status: 'error'
       });
+    } finally {
+      this.setState({ isLoading: false });
     }
   };
 
   handleLoadMore = () => {
-    this.setState((prevState) => ({ page: prevState.page + 1 }), this.handleSearch);
+    this.setState((prev) => ({ page: prev.page + 1 }));
   };
 
   handlePageChange = (newPage) => {
@@ -61,34 +61,25 @@ export class App extends Component {
   };
 
   render() {
-    const { images, status, page, totalPages, selectedImage } = this.state;
+    const { images, page, isLoading, selectedImage, error } = this.state;
 
     return (
       <div>
         <Searchbar onSubmit={this.handleSearchbarSubmit} />
-
-        {(() => {
-          if (status === 'loading') {
-            return <MyLoader/>;
-          } else if (status === 'success') {
-            return (
-              <>
-                <ImageGallery images={images} onSelect={this.handleImageSelect} />
-                <Button currentPage={page} totalPages={totalPages} onLoadMore={this.handleLoadMore} />
-              </>
-            );
-          } else if (status === 'error') {
-            return <p>Error fetching images</p>;
-          } else {
-            return null;
-          }
-        })()}
-
+        {isLoading && <MyLoader />}
+        {error && <p>Error fetching images</p>}
+        {images.length > 0 && (
+          <>
+            <ImageGallery images={images} onSelect={this.handleImageSelect} />
+            <Button currentPage={page} onLoadMore={this.handleLoadMore} />
+          </>
+        )}
         {selectedImage && <Modal image={selectedImage} onClose={this.handleCloseModal} />}
       </div>
     );
   }
 }
+
 
 
 

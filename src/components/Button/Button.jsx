@@ -1,11 +1,17 @@
 import React from 'react';
 
-export const Button = ({ currentPage, totalPages, onLoadMore }) => {
+export const Button = ({ onLoadMore }) => {
+  const handleLoadMoreClick = (e) => {
+    e.preventDefault();  
+
+    onLoadMore(); 
+  };
+
   return (
-    currentPage < totalPages && (
-      <button type="button" className='buttonLoad' onClick={onLoadMore}>
+   
+      <button type="button" className="buttonLoad" onClick={handleLoadMoreClick}>
         Load more...
       </button>
-    )
+  
   );
 };
