@@ -14,7 +14,7 @@ export class App extends Component {
     page: 1,
     query: '',
     selectedImage: null,
-    allImagesLoaded: true
+    loadMore: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -24,13 +24,14 @@ export class App extends Component {
   }
 
   handleSearch = async () => {
-    this.setState({ isLoading: true, error: null, allImagesLoaded: false });
+    this.setState({ isLoading: true, error: null});
 
     try {
       const newImages = await FetchImages(this.state.query, this.state.page, 12);
 
       this.setState((prevState) => ({
-        images: [...prevState.images, ...newImages],
+        images: [...prevState.images, ...newImages.hits],
+        loadMore: this.state.page < Math.ceil(newImages.totalHits / 12 )
       
       }));
     } catch (error) {
@@ -39,7 +40,7 @@ export class App extends Component {
         allImagesLoaded: false, 
       });
     } finally {
-      this.setState({ isLoading: false, allImagesLoaded: true });
+      this.setState({ isLoading: false });
     }
   };
 
@@ -52,7 +53,7 @@ export class App extends Component {
   };
 
   handleSearchbarSubmit = (query) => {
-    this.setState({ query, page: 1, images: [] , allImagesLoaded: false}); 
+    this.setState({ query, page: 1, images: []}); 
   };
 
   handleImageSelect = (selectedImage) => {
@@ -64,19 +65,16 @@ export class App extends Component {
   };
 
   render() {
-    const { images, page, isLoading, selectedImage, error, allImagesLoaded } = this.state;
+    const { images, page, isLoading, selectedImage, error} = this.state;
 
     return (
       <div>
         <Searchbar onSubmit={this.handleSearchbarSubmit} />
         {isLoading && <MyLoader />}
         {error && <p>Error fetching images</p>}
-        {images.length > 0 && (
-          <>
-            <ImageGallery images={images} onSelect={this.handleImageSelect} />
-            {allImagesLoaded && <Button currentPage={page} onLoadMore={this.handleLoadMore} isLoading={isLoading} />}
-          </>
-        )}
+        {images.length > 0 && <ImageGallery images={images} onSelect={this.handleImageSelect} />}
+        {this.state.loadMore && <Button currentPage={page} onLoadMore={this.handleLoadMore} isLoading={isLoading} />}
+
         {selectedImage && <Modal image={selectedImage} onClose={this.handleCloseModal} />}
       </div>
     );
